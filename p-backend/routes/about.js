@@ -11,7 +11,7 @@ import {
 } from "../controllers/about.js";
 const router = express.Router();
 
-router.get("/", protect, getAllAbout);
+router.get("/", getAllAbout);
 
 router.post("/",upload.single('file'), protect, enterAbout);
 

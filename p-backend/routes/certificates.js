@@ -32,7 +32,7 @@ import{
 } from '../controllers/certificates.js';
 const router = express.Router();
 
-router.get('/', protect, getAllCertificates);
+router.get('/', getAllCertificates);
 router.post("/", upload.single('file') ,protect, enterCertificates);
 router.get("/:id", protect, findACertificates);
 router.delete("/:id", protect, deleteACertificates);

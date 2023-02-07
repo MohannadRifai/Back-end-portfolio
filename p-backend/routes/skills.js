@@ -10,7 +10,7 @@ getAllSkills,
 } from "../controllers/skills.js";
 const router = express.Router();
 
-router.get("/", protect, getAllSkills);
+router.get("/", getAllSkills);
 
 router.post("/", protect, upload.single('file') ,enterSkills);
 

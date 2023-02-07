@@ -32,7 +32,7 @@ import{
   upload
 } from '../controllers/projects.js'
 
-router.get("/", protect, getAllProjects);
+router.get("/", getAllProjects);
 router.post('/', protect, upload.single('file') ,enterProjects);
 router.get('/:id', protect, findAProject);
 router.delete('/:id', protect, deleteAProject);

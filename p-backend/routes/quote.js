@@ -10,7 +10,7 @@ import{
 } from '../controllers/quote.js';
 
 
-router.get("/", protect, getAllQuote);
+router.get("/", getAllQuote);
 router.post('/',protect, enterQuote);
 router.get('/:id', protect, findAQuote);
 router.delete('/:id', protect, deleteAQuote);
