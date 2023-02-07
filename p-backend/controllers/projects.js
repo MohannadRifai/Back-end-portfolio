@@ -27,12 +27,14 @@ export const getAllProjects = async (req, res) => {
 };
 
 export const enterProjects = async (req, res) => {
+  console.log(req.files);
+  console.log(req.body);
   try {
     const newDocument = new projects({
       number: req.body.number,
-      image: req.file.path,
+      image1: req.files[0].path,
+      image2: req.files[1].path,
       description: req.body.description,
-
       title: req.body.title,
       link: req.body.link,
     });
@@ -95,20 +97,22 @@ export const deleteAProject = async (req, res) => {
 };
 
 export const updateAProject = async (req, res) => {
-  console.log("update has started");
-  const id = req.params.id;
-
-  const title = req.body.title;
-  const description = req.body.description;
-  const link = req.body.link;
-  const number = req.body.number;
-
-  const image = req.file.path;
-
+  console.log(1);
   try {
+    const id = req.params.id;
+    const updateFields = {};
+
+    if (req.body.number) updateFields.number = req.body.number;
+    if (req.body.titlet) updateFields.title = req.body.title;
+    if (req.files) updateFields.image1 = req.files[0].path;
+    if (req.files) updateFields.image2 = req.files[1].path;
+    if (req.body.link) updateFields.link - req.body.link;
+    if (req.body.description) updateFields.description = req.body.description;
+    console.log(req.file);
+    console.log(req.body);
     const projectDoc = await projects.findByIdAndUpdate(id, {
-      $set: { title, description, image, link, number },
-    });
+      $set: updateFields,
+    }, { new: true });
 
     if (!projectDoc) {
       return res.status(404).send("Document not found");

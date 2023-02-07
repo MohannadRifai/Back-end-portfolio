@@ -105,16 +105,15 @@ export const deleteAnAbout = async (req, res) => {
 export const updateAnAbout = async (req, res) => {
   try {
     const id = req.params.id;
-    const quote = req.body.quote;
-    const description = req.body.description;
-    const image = req.file.path;
-
-    console.log(req.body.description);
-    console.log(req.body.quote);
+    const updateFields = {};
+    
+    if (req.body.quote) updateFields.quote = req.body.quote;
+    if (req.body.description) updateFields.description = req.body.description;
+    if (req.file) updateFields.image = req.file.path;
 
     const aboutDoc = await about.findByIdAndUpdate(id, {
-      $set: { quote, description, image },
-    });
+      $set: updateFields,
+    }, { new: true });
 
     if (!aboutDoc) return res.status(404).send("Document not found");
     const user = await User.findById(req.user.id);

@@ -91,14 +91,15 @@ export const deleteAnSkills = async (req, res) => {
 export const updateAnSkills = async (req, res) => {
   try {
     const id = req.params.id;
-    const description = req.body.description;
-    const image = req.file.path;
+    const updateFields = {};
+    
+    if (req.body.description) updateFields.description = req.body.description;
+    if (req.file) updateFields.image = req.file.path;
 
-    console.log(req.body.description);
 
     const aboutDoc = await skills.findByIdAndUpdate(id, {
-      $set: { description, image },
-    });
+      $set: updateFields,
+    }, { new: true });
 
     if (!aboutDoc) return res.status(404).send("Document not found");
     const user = await User.findById(req.user.id);
