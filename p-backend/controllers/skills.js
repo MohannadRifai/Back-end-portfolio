@@ -8,13 +8,28 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
   },
+
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    console.log(file);
+
+    const { fieldname, originalname } = file;
+    const date = Date.now();
+    // filename will be: image-1345923023436343-filename.png
+    const filename = `${fieldname}-${date}-${originalname}`;
+    cb(null, filename);
   },
 });
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 5000000 },
+  fileFilter: fileFilter,
 });
 
 export const getAllSkills = async (req, res) => {
@@ -27,7 +42,7 @@ export const getAllSkills = async (req, res) => {
 export const enterSkills = async (req, res) => {
   try {
     const newDocument = new skills({
-      image: req.file.path,
+      image: req.file.filename,
       description: req.body.description,
     });
 
@@ -94,7 +109,7 @@ export const updateAnSkills = async (req, res) => {
     const updateFields = {};
     
     if (req.body.description) updateFields.description = req.body.description;
-    if (req.file) updateFields.image = req.file.path;
+    if (req.file) updateFields.image = req.file.filename;
 
 
     const aboutDoc = await skills.findByIdAndUpdate(id, {

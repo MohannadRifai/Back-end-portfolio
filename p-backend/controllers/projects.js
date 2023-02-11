@@ -9,13 +9,29 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
   },
+
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    console.log(file);
+
+    const { fieldname, originalname } = file;
+    const date = Date.now();
+    // filename will be: image-1345923023436343-filename.png
+    const filename = `${fieldname}-${date}-${originalname}`;
+    cb(null, filename);
   },
 });
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 5000000 },
+  fileFilter: fileFilter,
 });
 
 export const getAllProjects = async (req, res) => {
@@ -32,8 +48,8 @@ export const enterProjects = async (req, res) => {
   try {
     const newDocument = new projects({
       number: req.body.number,
-      image1: req.files[0].path,
-      image2: req.files[1].path,
+      image1: req.files[0].filename,
+      image2: req.files[1].filename,
       description: req.body.description,
       title: req.body.title,
       link: req.body.link,
@@ -104,8 +120,8 @@ export const updateAProject = async (req, res) => {
 
     if (req.body.number) updateFields.number = req.body.number;
     if (req.body.titlet) updateFields.title = req.body.title;
-    if (req.files) updateFields.image1 = req.files[0].path;
-    if (req.files) updateFields.image2 = req.files[1].path;
+    if (req.files) updateFields.image1 = req.files[0].filename;
+    if (req.files) updateFields.image2 = req.files[1].filename;
     if (req.body.link) updateFields.link - req.body.link;
     if (req.body.description) updateFields.description = req.body.description;
     console.log(req.file);

@@ -16,18 +16,34 @@ import User from "../models/user.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./uploads");
+    cb(null, "./uploads/");
   },
+
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    console.log(file);
+
+    const { fieldname, originalname } = file;
+    const date = Date.now();
+    // filename will be: image-1345923023436343-filename.png
+    const filename = `${fieldname}-${date}-${originalname}`;
+    cb(null, filename);
   },
-});
-export const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5000000 },
 });
 
-export const getAllAbout = async (req, res) => {
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+export const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+});
+
+export const getAllAbout = (req, res) => {
   about.find({}, (error, abouts) => {
     if (error) return res.status(500).send(error);
     res.status(200).json(abouts);
@@ -42,7 +58,7 @@ export const enterAbout = async (req, res) => {
     }
     const newDocument = new about({
       quote: req.body.quote,
-      image: req.file.path,
+      image: req.file.filename,
       description: req.body.description,
     });
 
@@ -109,7 +125,7 @@ export const updateAnAbout = async (req, res) => {
     
     if (req.body.quote) updateFields.quote = req.body.quote;
     if (req.body.description) updateFields.description = req.body.description;
-    if (req.file) updateFields.image = req.file.path;
+    if (req.file) updateFields.image = req.file.filename;
 
     const aboutDoc = await about.findByIdAndUpdate(id, {
       $set: updateFields,

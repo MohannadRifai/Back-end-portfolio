@@ -33,9 +33,9 @@ import{
 } from '../controllers/projects.js'
 
 router.get("/", getAllProjects);
-router.post('/', protect, upload.single('file') ,enterProjects);
+router.post('/', protect, upload.array('file', 2) ,enterProjects);
 router.get('/:id', protect, findAProject);
 router.delete('/:id', protect, deleteAProject);
-router.patch('/:id', protect, upload.single('file') ,updateAProject);
+router.patch('/:id', protect, upload.array('file', 2) ,updateAProject);
 
 export default router

@@ -11,12 +11,22 @@ import errorHandler from "./middleware/errorMiddleware.js";
 import userrouter from "./routes/user.js"
 const app = express()
 import dotenv from 'dotenv'
+import * as url from 'url';
+import fs from "fs"
+import path from 'path'
 dotenv.config()
 const PORT =  process.env.PORT || 5000
 
 app.use(bodyParser.json({extended: true}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+
+const dir = path.join(__dirname, "uploads");
+app.use(express.static(dir));
 
 const CONNECTION_URL = process.env.CONNECTION_URL
 mongoose.set('strictQuery', true);
@@ -35,3 +45,11 @@ app.use('/certificates', certificatesRoutes)
 app.use('/quote', quoteRoutes);
 app.use("/users", userrouter);
 app.use(errorHandler);
+
+fs.readdir(dir, (err, files) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(files);
+    }
+  });
