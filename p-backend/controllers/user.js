@@ -8,16 +8,16 @@ import User from "../models/user.js";
 // to register new user by using POST and it will be /api/users
 export const registerUser = asyncHandler(async (req, res) => {
   //FOR THE BODY DATA
-  const { name, email, password } = req.body;
+  const { user, pwd } = req.body;
 
-  if (!name || !email || !password) {
+  if (!user || !pwd) {
     res.status(400);
     throw new Error("Please add all fields");
   }
 
   //to check if the user exists and to find him/her by email
 
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ user });
   // if the user already exist, we dont want to reregester him/her
   if (userExists) {
     res.status(400);
@@ -25,21 +25,19 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
   // Hash pasword
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(pwd, salt);
 
   //create the user
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
+  const usser = await User.create({
+    user,
+    pwd: hashedPassword,
   });
   //to check if user was created
-  if (user) {
+  if (usser) {
     res.status(201).json({
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
+      _id: usser.id,
+      user: usser.user,
+      token: generateToken(usser._id),
     });
   } else {
     res.status(400);
@@ -49,16 +47,15 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 // to authenticate a user by using POST and it will be /api/users/login
 export const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  //check for user email and the pass to login
-  const user = await User.findOne({ email });
+  const { user, pwd } = req.body;
+  const usser = await User.findOne({ user });
 
-  if (user && (await bcrypt.compare(password, user.password))) {
+  if (usser && (await bcrypt.compare(pwd, usser.pwd))) {
     res.json({
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
+      _id: usser.id,
+      user: usser.user,
+      pwd: usser.pwd,
+      token: generateToken(usser._id),
     });
   } else {
     res.status(400);
@@ -68,11 +65,10 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 // to get user data by using GET and it will be /api/users/me
 export const getMe = asyncHandler(async (req, res) => {
-  const { _id, name, email } = await User.findById(req.user.id);
+  const { _id, user } = await User.findById(req.usser.id);
   res.status(200).json({
     id: _id,
-    name,
-    email,
+    user,
   });
 });
 
